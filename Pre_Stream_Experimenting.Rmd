@@ -29,10 +29,12 @@ if(!require(tidyverse)){install.packages('tidyverse')}
 library(tidyverse)
 if(!require(tidymodels)){install.packages('tidymodels')}
 library(tidymodels)
+if(!require(GGally)){install.packages('GGally')}
+library(GGally)
 
 ```
 
-```{r}
+```{r reading in data}
 
 ## Let's load the Penguins data!
 
@@ -45,13 +47,23 @@ glimpse(penguins)
 
 ```
 
-```{r}
+```{r using group by and tally}
 
 ## We can see how many species we have + how many of each species in our dataset
 
 penguins %>% 
   group_by(species) %>% 
   tally()
+
+## But how many are on each island? If we wanted to visit only one of the islands, what would be best for our penguin seeing buck?
+
+penguins %>% 
+  group_by(species, island) %>% 
+  tally()
+
+```
+
+```{r visualizing distributions and relationships between variables}
 
 
 
