@@ -1,30 +1,43 @@
 ---
 title: "Pre_Stream_Experimenting"
 author: "Michael Mullarkey"
-date: "2/14/2021"
-output: html_document
+author: "Michael Mullarkey"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 5
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+geometry: margin=0.50in
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE, cache = FALSE}
+require("knitr")
+## setting working directory
+opts_knit$set(root.dir = "/Users/Carbonite/Documents/Github_R/palmer_penguins_example") ## Will need to change across computers
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, warning = FALSE, message = FALSE, include = FALSE)
+
 ```
 
-## R Markdown
+```{r}
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+if(!require(palmerpenguins)){install.packages('palmerpenguins')}
+library(palmerpenguins)
+if(!require(tidyverse)){install.packages('tidyverse')}
+library(tidyverse)
+if(!require(tidymodels)){install.packages('tidymodels')}
+library(tidymodels)
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
+```{r}
 
-You can also embed plots, for example:
+library(palmerpenguins)
+data(package = 'palmerpenguins')
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+glimpse(penguins)
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
