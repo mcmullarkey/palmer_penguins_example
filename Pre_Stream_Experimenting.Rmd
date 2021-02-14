@@ -34,10 +34,26 @@ library(tidymodels)
 
 ```{r}
 
+## Let's load the Penguins data!
+
 library(palmerpenguins)
 data(package = 'palmerpenguins')
 
+## Glimpse helps us get a sense of what kinds of dimensions, types of variables, and responses we have in our data frame
+
 glimpse(penguins)
+
+```
+
+```{r}
+
+## We can see how many species we have + how many of each species in our dataset
+
+penguins %>% 
+  group_by(species) %>% 
+  tally()
+
+
 
 ```
 
