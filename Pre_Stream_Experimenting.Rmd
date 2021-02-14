@@ -91,17 +91,83 @@ penguins %>%
 
 penguins %>%
   dplyr::select(is.numeric, -year) %>%
-  GGally::ggpairs(aes(color = species)) +
+  GGally::ggpairs(aes()) +
   scale_colour_manual(values = c("darkorange","purple","cyan4")) +
   scale_fill_manual(values = c("darkorange","purple","cyan4"))
 
-## Adding in species for some more understanding and color
+## Adding in species for some more understanding and color. Also, makes more sense to have categorical variable first rather than last or in the middle for aesthetic purposes.
 
 penguins %>%
-  dplyr::select(is.numeric, -year) %>%
+  dplyr::select(species, is.numeric, -year) %>%
   GGally::ggpairs(aes(color = species)) +
   scale_colour_manual(values = c("darkorange","purple","cyan4")) +
   scale_fill_manual(values = c("darkorange","purple","cyan4"))
+
+```
+```{r calculating the mean across a bunch of variables at once}
+
+## Taking the mean across a bunch of variables
+
+penguins %>% 
+  group_by(species) %>% 
+  dplyr::summarise(across(
+    is.numeric,
+    mean
+  ))
+
+## What if we want to deal with NA values? We could ignore them first. We could also impute data, but probably makes more sense to talk about that in a later stream
+
+penguins %>% 
+  group_by(species) %>% 
+  dplyr::summarise(across(
+    is.numeric,
+    ~mean(.x, na.rm = T)
+  ))
+
+## What if we don't want the year column?
+
+## This version kind of works, but not really since we're missing body mass now
+
+penguins %>% 
+  group_by(species) %>% 
+  dplyr::summarise(across(
+    contains("mm"),
+    ~mean(.x, na.rm = T)
+  ))
+
+## This version is probably easier in this case (Though demonstrates that there are a lot of ways to solve any problem in R)
+
+penguins %>% 
+  group_by(species) %>% 
+  dplyr::summarise(across(
+    is.numeric,
+    ~mean(.x, na.rm = T)
+  )) %>% 
+  dplyr::select(-year)
+
+```
+
+```{r what if we want to get multiple summary statistics across variables at once}
+
+penguins %>% 
+  group_by(species) %>% 
+  dplyr::summarise(across(
+    .cols = is.numeric,
+    .fns = list(mean = mean, sd = sd), na.rm = T,
+    .names = "{col}_{fn}"
+  )) %>% 
+  dplyr::select(-contains("year"))
+
+## We can select if we want to make this simpler/easier to read
+
+penguins %>% 
+  group_by(species) %>% 
+  dplyr::summarise(across(
+    .cols = is.numeric,
+    .fns = list(mean = mean, sd = sd), na.rm = T,
+    .names = "{col}_{fn}"
+  )) %>% 
+  dplyr::select(species, contains("bill_length")) 
 
 ```
 
