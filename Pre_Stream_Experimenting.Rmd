@@ -63,9 +63,45 @@ penguins %>%
 
 ```
 
-```{r visualizing distributions and relationships between variables}
+```{r visualizing distributions and relationships between species and island}
+
+## Modified code from https://allisonhorst.github.io/palmerpenguins/articles/intro.html
+
+## First doing this with species and island, not super intuitive, though bottom left column is basically what we get with our group_by above
+
+penguins %>%
+  dplyr::select(species, island) %>%
+  GGally::ggpairs(aes(color = species)) +
+  scale_colour_manual(values = c("darkorange","purple","cyan4")) +
+  scale_fill_manual(values = c("darkorange","purple","cyan4"))
+
+```
 
 
+```{r expanding our plotting to other variables}
+## Looking at Species and a numeric variable
+
+penguins %>%
+  dplyr::select(species, bill_length_mm) %>%
+  GGally::ggpairs(aes(color = species)) +
+  scale_colour_manual(values = c("darkorange","purple","cyan4")) +
+  scale_fill_manual(values = c("darkorange","purple","cyan4"))
+
+## Looking across all numberic variables other than year
+
+penguins %>%
+  dplyr::select(is.numeric, -year) %>%
+  GGally::ggpairs(aes(color = species)) +
+  scale_colour_manual(values = c("darkorange","purple","cyan4")) +
+  scale_fill_manual(values = c("darkorange","purple","cyan4"))
+
+## Adding in species for some more understanding and color
+
+penguins %>%
+  dplyr::select(is.numeric, -year) %>%
+  GGally::ggpairs(aes(color = species)) +
+  scale_colour_manual(values = c("darkorange","purple","cyan4")) +
+  scale_fill_manual(values = c("darkorange","purple","cyan4"))
 
 ```
 
