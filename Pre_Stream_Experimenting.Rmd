@@ -31,6 +31,8 @@ if(!require(tidymodels)){install.packages('tidymodels')}
 library(tidymodels)
 if(!require(GGally)){install.packages('GGally')}
 library(GGally)
+if(!require(lubridate)){install.packages('lubridate')}
+library(lubridate)
 
 ```
 
@@ -158,7 +160,7 @@ penguins %>%
   )) %>% 
   dplyr::select(-contains("year"))
 
-## We can select if we want to make this simpler/easier to read
+## We can select one variable at a time if we want to make this simpler/easier to read
 
 penguins %>% 
   group_by(species) %>% 
@@ -168,6 +170,15 @@ penguins %>%
     .names = "{col}_{fn}"
   )) %>% 
   dplyr::select(species, contains("bill_length")) 
+
+```
+```{r checking out the year variable}
+
+## About an even number of penguins across 3 years
+
+penguins %>% 
+  group_by(year) %>% 
+  tally()
 
 ```
 
