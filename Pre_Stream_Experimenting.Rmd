@@ -174,7 +174,7 @@ penguins %>%
 ## Adding in species for some more understanding and color. Also, makes more sense to have categorical variable first rather than last or in the middle for aesthetic purposes.
 
 penguins %>%
-  dplyr::select(species, is.numeric, -year) %>%
+  dplyr::select(species, contains("mm")) %>%
   GGally::ggpairs(aes(color = species)) +
   scale_colour_manual(values = c("darkorange","purple","cyan4")) +
   scale_fill_manual(values = c("darkorange","purple","cyan4"))
