@@ -36,6 +36,10 @@ if(!require(remotes)){install.packages('remotes')}
 library(remotes)
 remotes::install_github('jorvlan/raincloudplots')
 library(raincloudplots)
+if(!require(doMC)){install.packages('doMC')}
+library(doMC)
+if(!require(tictoc)){install.packages('tictoc')}
+library(tictoc)
 
 ```
 
@@ -318,3 +322,77 @@ penguins_years %>%
   tally()
 
 ```
+
+```{r can we predict if the penguins were observed before 2009 or not}
+
+## First we split the dataset into training and testing, stratified on the outcome (so about equal proportions of the outcome show up in both datasets)
+
+set.seed(33)
+penguins_initial_split <- initial_split(penguins_years, prop = 3/4, strata = before_2009)
+
+penguins_train <- training(penguins_initial_split)
+penguins_test <- testing(penguins_initial_split)
+
+```
+
+```{r}
+
+## Let's clean the training data and get it ready to go via recipes
+
+rec_penguins <- recipe(before_2009 ~ ., data = penguins_train) %>% 
+  step_rm(year) %>% 
+  step_knnimpute(all_predictors()) %>% 
+  step_normalize(all_numeric()) %>%
+  step_BoxCox(all_numeric())
+
+rec_penguins
+
+## Creating a model
+
+lr_mod <- logistic_reg() %>% 
+  set_engine("glm")
+
+## Creating a workflow
+
+penguins_wf <- workflow() %>% 
+  add_recipe(rec_penguins) %>% 
+  add_model(lr_mod)
+
+## Fit 10 fold cross-validation
+
+# Set up multiple cores
+
+registerDoMC(cores = 7)
+
+# Create the cross-validation folds
+
+set.seed(33)
+folds_penguins_pred <- vfold_cv(penguins_train, v = 10, repeats = 5, strata = before_2009)
+
+## Run the CV models here
+keep_pred <- control_resamples(save_pred = TRUE)
+tic()
+set.seed(33)
+penguins_fit_rs <- 
+  penguins_wf %>% 
+  fit_resamples(folds_penguins_pred, control = keep_pred)
+toc()
+
+## Get the AUC value here
+
+auc_penguins <- penguins_fit_rs %>% 
+  collect_predictions(summarize = TRUE) %>% 
+  roc_auc(truth = before_2009, .estimate = .pred_yes) %>% 
+  print()
+
+## Show the ROC curve here
+
+auc_penguins_roc_curve <- penguins_fit_rs %>% 
+  collect_predictions(summarize = TRUE) %>% 
+  roc_curve(truth = before_2009, .estimate = .pred_yes) %>% 
+  autoplot() %>% 
+  print()
+
+```
+
+
