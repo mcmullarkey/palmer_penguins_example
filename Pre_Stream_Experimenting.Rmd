@@ -44,7 +44,6 @@ library(raincloudplots)
 ## Let's load the Penguins data!
 
 library(palmerpenguins)
-data(package = 'palmerpenguins')
 
 ## Glimpse helps us get a sense of what kinds of dimensions, types of variables, and responses we have in our data frame
 
@@ -92,6 +91,7 @@ penguins %>%
   geom_histogram(aes(x = bill_length_mm), alpha = 0.6)
 
 ```
+
 ```{r showing raincloud plots for numeric variables}
 
 ## Creating the necessary inputs for the raincloud plots package https://github.com/jorvlan/raincloudplots
@@ -136,7 +136,6 @@ raincloud_1_h
 
 ```
 
-
 ```{r visualizing distributions and relationships between species and island}
 
 ## Modified code from https://allisonhorst.github.io/palmerpenguins/articles/intro.html
@@ -150,7 +149,6 @@ penguins %>%
   scale_fill_manual(values = c("darkorange","purple","cyan4"))
 
 ```
-
 
 ```{r expanding our plotting to other variables}
 ## Looking at Species and a numeric variable
@@ -178,6 +176,7 @@ penguins %>%
   scale_fill_manual(values = c("darkorange","purple","cyan4"))
 
 ```
+
 ```{r calculating the mean for one numeric variable}
 
 ## This way seems like it should work, but actually can completely mess up your data/make it not tidy
@@ -210,7 +209,6 @@ penguins_hooray <- penguins %>%
   print()
 
 ```
-
 
 ```{r calculating the mean across a bunch of variables at once}
 
@@ -278,6 +276,7 @@ penguins %>%
   dplyr::select(species, contains("bill_length")) 
 
 ```
+
 ```{r checking out the year variable}
 
 ## About an even number of penguins across 3 years
@@ -287,4 +286,3 @@ penguins %>%
   tally()
 
 ```
-
