@@ -105,6 +105,28 @@ penguins %>%
   scale_fill_manual(values = c("darkorange","purple","cyan4"))
 
 ```
+```{r calculating the mean for one numeric variable}
+
+## This way seems like it should work, but actually can completely mess up your data/make it not tidy
+
+penguins_oh_no <- penguins %>% 
+  mutate(mean_bill_length = mean(bill_length_mm, na.rm = T)) %>% 
+  print()
+
+## If we do something like run a linear model predicting mean bill length (which we wouldn't do, but it's a useful illustration) we'll think we're looking at something measured 344 times
+
+(summary(lm(mean_bill_length ~ species, data = penguins_oh_no)))
+
+## Instead we can use group_by species and then summarise to create a new tibble that's more useful
+
+penguins_hooray <- penguins %>% 
+  group_by(species) %>% 
+  summarise(mean_bill_length = mean(bill_length_mm, na.rm = T)) %>% 
+  print()
+
+```
+
+
 ```{r calculating the mean across a bunch of variables at once}
 
 ## Taking the mean across a bunch of variables
