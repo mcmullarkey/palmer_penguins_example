@@ -51,7 +51,7 @@ library(palmerpenguins)
 
 ## Glimpse helps us get a sense of what kinds of dimensions, types of variables, and responses we have in our data frame
 
-glimpse(penguins)
+Alright trying to add music and seeing what happens
 
 ```
 
