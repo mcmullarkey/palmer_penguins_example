@@ -32,6 +32,10 @@ if(!require(GGally)){install.packages('GGally')}
 library(GGally)
 if(!require(lubridate)){install.packages('lubridate')}
 library(lubridate)
+if(!require(remotes)){install.packages('remotes')}
+library(remotes)
+remotes::install_github('jorvlan/raincloudplots')
+library(raincloudplots)
 
 ```
 
@@ -86,6 +90,49 @@ penguins %>%
   dplyr::select(bill_length_mm, species) %>% 
   ggplot(aes(x = bill_length_mm, fill = species)) + 
   geom_histogram(aes(x = bill_length_mm), alpha = 0.6)
+
+```
+```{r showing raincloud plots for numeric variables}
+
+## Creating the necessary inputs for the raincloud plots package
+
+chinstrap_bill_length <- penguins %>% 
+  filter(species == "Chinstrap") %>% 
+  dplyr::select(bill_length_mm) %>% 
+  mutate(bill_length_mm = as.integer(bill_length_mm)) %>% 
+  deframe() %>% 
+  print()
+
+gentoo_bill_length <- penguins %>% 
+  filter(species == "Gentoo") %>% 
+  dplyr::select(bill_length_mm) %>% 
+  mutate(bill_length_mm = as.integer(bill_length_mm)) %>% 
+  deframe() %>% 
+  print()
+
+## Helper function that puts the data in long format for raincloud plot
+
+df_1x1 <- data_1x1(
+  array_1 = chinstrap_bill_length,
+  array_2 = gentoo_bill_length,
+  jit_distance = .1,
+  jit_seed = 321)
+
+## Actually makes the raincloud plot
+
+raincloud_1_h <- raincloud_1x1(
+  data = df_1x1, 
+  colors = (c('dodgerblue','darkorange')), 
+  fills = (c('dodgerblue','darkorange')), 
+  size = 1, 
+  alpha = .6, 
+  ort = 'h') +
+scale_x_continuous(breaks=c(1,2), labels=c("Group1", "Group2"), limits=c(0, 3)) +
+  xlab("Groups") + 
+  ylab("Score") +
+  theme_classic()
+
+raincloud_1_h
 
 ```
 
