@@ -190,6 +190,12 @@ penguins_oh_no <- penguins %>%
 
 (summary(lm(mean_bill_length ~ species, data = penguins_oh_no)))
 
+## Btw we can tidy outputs from lms, though in this case that would obscure our df problem
+
+(summary(lm(mean_bill_length ~ species, data = penguins_oh_no))) %>% 
+  tidy() %>% 
+  print()
+
 ## Instead we can use group_by species and then summarise to create a new tibble that's more useful
 
 penguins_hooray <- penguins %>% 
