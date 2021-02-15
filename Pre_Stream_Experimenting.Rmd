@@ -259,7 +259,7 @@ penguins %>%
   group_by(species) %>% 
   dplyr::summarise(across(
     .cols = is.numeric,
-    .fns = list(mean = mean, sd = sd), na.rm = T,
+    .fns = list(mean = mean, sd = sd, median = median, min = min, max = max), na.rm = T,
     .names = "{col}_{fn}"
   )) %>% 
   dplyr::select(-contains("year"))
@@ -270,7 +270,7 @@ penguins %>%
   group_by(species) %>% 
   dplyr::summarise(across(
     .cols = is.numeric,
-    .fns = list(mean = mean, sd = sd), na.rm = T,
+    .fns = list(mean = mean, sd = sd, median = median, min = min, max = max), na.rm = T,
     .names = "{col}_{fn}"
   )) %>% 
   dplyr::select(species, contains("bill_length")) 
