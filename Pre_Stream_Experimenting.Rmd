@@ -124,6 +124,12 @@ penguins_hooray <- penguins %>%
   summarise(mean_bill_length = mean(bill_length_mm, na.rm = T)) %>% 
   print()
 
+## It doesn't have to be grouped by species either!
+
+penguins_hooray <- penguins %>% 
+  summarise(mean_bill_length = mean(bill_length_mm, na.rm = T)) %>% 
+  print()
+
 ```
 
 
