@@ -64,6 +64,32 @@ penguins %>%
 
 ```
 
+```{r visualizing just the distributions of species and a numeric variable}
+
+## Getting the bar plot of species alone
+
+penguins %>% 
+  dplyr::select(species) %>% 
+  ggplot(aes(x = species)) + 
+  geom_histogram(stat = "count")
+
+## Getting the histogram of bill length alone
+
+penguins %>% 
+  dplyr::select(bill_length_mm) %>% 
+  ggplot(aes(x = bill_length_mm)) + 
+  geom_histogram(alpha = 0.6)
+
+## We can visualize the same distribution with different colors for different groups
+
+penguins %>% 
+  dplyr::select(bill_length_mm, species) %>% 
+  ggplot(aes(x = bill_length_mm, fill = species)) + 
+  geom_histogram(aes(x = bill_length_mm), alpha = 0.6)
+
+```
+
+
 ```{r visualizing distributions and relationships between species and island}
 
 ## Modified code from https://allisonhorst.github.io/palmerpenguins/articles/intro.html
