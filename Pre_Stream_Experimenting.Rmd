@@ -1,7 +1,6 @@
 ---
 title: "Pre_Stream_Experimenting"
 author: "Michael Mullarkey"
-author: "Michael Mullarkey"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
   html_document:
