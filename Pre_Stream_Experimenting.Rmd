@@ -279,10 +279,42 @@ penguins %>%
 
 ```{r checking out the year variable}
 
-## About an even number of penguins across 3 years
+## About even across years
 
 penguins %>% 
   group_by(year) %>% 
+  tally()
+
+## Let's create a earlier than 2009, later than 2009 variable (Initially a character variable, so we want to convert it to a factor)
+
+penguins_years <- penguins %>% 
+  mutate(before_2009 = if_else(year < 2009, "yes", "no"),
+         before_2009 = as.factor(before_2009)) %>% 
+  print()
+
+## Can now look at the updated tally
+
+penguins_years %>% 
+  group_by(before_2009) %>% 
+  tally()
+
+## But wait, what if we'd had NAs? if_else might throw an error, but regular ifelse wouldn't and our info would be wrong. Can use case_when for safety
+
+penguins_years <- penguins %>% 
+  mutate(before_2009 = case_when(
+    
+   year < 2009 ~ "yes",
+   year >= 2009 ~ "no",
+   TRUE ~ NA_character_
+    
+  ),
+  before_2009 = as.factor(before_2009)) %>% 
+  print()
+
+## Can now look at the updated tally again
+
+penguins_years %>% 
+  group_by(before_2009) %>% 
   tally()
 
 ```
