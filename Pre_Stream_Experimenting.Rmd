@@ -94,7 +94,7 @@ penguins %>%
 ```
 ```{r showing raincloud plots for numeric variables}
 
-## Creating the necessary inputs for the raincloud plots package
+## Creating the necessary inputs for the raincloud plots package https://github.com/jorvlan/raincloudplots
 
 chinstrap_bill_length <- penguins %>% 
   filter(species == "Chinstrap") %>% 
