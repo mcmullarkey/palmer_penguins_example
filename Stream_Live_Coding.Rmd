@@ -1,0 +1,239 @@
+---
+title: "Stream_Live_Coding"
+author: "Michael Mullarkey"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 5
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+geometry: margin=0.50in
+---
+
+```{r setup, include=FALSE, cache = FALSE}
+require("knitr")
+## setting working directory
+opts_knit$set(root.dir = "/Users/Carbonite/Documents/Github_R/palmer_penguins_example") ## Will need to change across computers
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, warning = FALSE, message = FALSE, include = FALSE)
+
+```
+
+```{r}
+
+if(!require(palmerpenguins)){install.packages('palmerpenguins')}
+library(palmerpenguins)
+if(!require(tidyverse)){install.packages('tidyverse')}
+library(tidyverse)
+if(!require(tidymodels)){install.packages('tidymodels')}
+library(tidymodels)
+if(!require(GGally)){install.packages('GGally')}
+library(GGally)
+if(!require(lubridate)){install.packages('lubridate')}
+library(lubridate)
+if(!require(remotes)){install.packages('remotes')}
+library(remotes)
+remotes::install_github('jorvlan/raincloudplots')
+library(raincloudplots)
+if(!require(doMC)){install.packages('doMC')}
+library(doMC)
+if(!require(tictoc)){install.packages('tictoc')}
+library(tictoc)
+
+```
+
+```{r reading in data}
+
+## Let's load the Penguins data!
+
+
+
+## Glimpse helps us get a sense of what kinds of dimensions, types of variables, and responses we have in our data frame
+
+```
+
+```{r using group by and tally}
+
+## We can see how many species we have + how many of each species in our dataset
+
+
+
+## But how many are on each island? If we wanted to visit only one of the islands, what would be best for our penguin seeing buck?
+
+
+
+```
+
+```{r visualizing just the distributions of species and a numeric variable}
+
+## Getting the bar plot of species alone
+
+
+
+## Getting the histogram of bill length alone
+
+
+
+## We can visualize the same distribution with different colors for different groups
+
+
+
+```
+
+```{r showing raincloud plots for numeric variables}
+
+## Creating the necessary inputs for the raincloud plots package https://github.com/jorvlan/raincloudplots
+
+
+
+## Helper function that puts the data in long format for raincloud plot
+
+
+
+## Actually makes the raincloud plot
+
+
+
+```
+
+```{r visualizing distributions and relationships between species and island}
+
+## Modified code from https://allisonhorst.github.io/palmerpenguins/articles/intro.html
+
+## First doing this with species and island, not super intuitive, though bottom left column is basically what we get with our group_by above
+
+
+
+```
+
+```{r expanding our plotting to other variables}
+## Looking at Species and a numeric variable
+
+
+## Looking across all numberic variables other than year
+
+
+## Adding in species for some more understanding and color. Also, makes more sense to have categorical variable first rather than last or in the middle for aesthetic purposes.
+
+
+
+```
+
+```{r calculating the mean for one numeric variable}
+
+## This way seems like it should work, but actually can completely mess up your data/make it not tidy
+
+
+## If we do something like run a linear model predicting mean bill length (which we wouldn't do, but it's a useful illustration) we'll think we're looking at something measured 344 times
+
+
+## Btw we can tidy outputs from lms, though in this case that would obscure our df problem
+
+
+## Instead we can use group_by species and then summarise to create a new tibble that's more useful
+
+
+## It doesn't have to be grouped by species either!
+
+
+```
+
+```{r calculating the mean across a bunch of variables at once}
+
+## Taking the mean across a bunch of variables
+
+
+
+## What if we want to deal with NA values? We could ignore them first. We could also impute data, but probably makes more sense to talk about that in a later stream
+
+
+
+## What if we don't want the year column?
+
+## This version kind of works, but not really since we're missing body mass now
+
+
+
+## This version is probably easier in this case (Though demonstrates that there are a lot of ways to solve any problem in R)
+
+
+
+```
+
+```{r what if we want to get multiple summary statistics across variables at once}
+
+
+
+## We can select one variable at a time if we want to make this simpler/easier to read
+
+
+
+```
+
+```{r checking out the year variable}
+
+## About even across years
+
+
+
+## Let's create a earlier than 2009, later than 2009 variable (Initially a character variable, so we want to convert it to a factor)
+
+
+
+## Can now look at the updated tally
+
+
+
+## But wait, what if we'd had NAs? if_else might throw an error, but regular ifelse wouldn't and our info would be wrong. Can use case_when for safety
+
+
+## Can now look at the updated tally again
+
+
+```
+
+```{r can we predict if the penguins were observed before 2009 or not}
+
+## First we split the dataset into training and testing, stratified on the outcome (so about equal proportions of the outcome show up in both datasets)
+
+
+```
+
+```{r minimally preprocessing the data creating the model and evaluating}
+
+## Let's clean the training data and get it ready to go via recipes
+
+
+## Creating a model
+
+
+## Creating a workflow
+
+
+
+## Fit 10 fold cross-validation
+
+# Set up multiple cores
+
+
+
+# Create the cross-validation folds
+
+
+
+## Run the CV models here
+
+
+
+## Get the AUC value here
+
+
+
+## Show the ROC curve here
+
+
+
+```
+
+
