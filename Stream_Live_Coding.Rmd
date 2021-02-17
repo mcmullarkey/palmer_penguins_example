@@ -47,9 +47,11 @@ library(tictoc)
 
 ## Let's load the Penguins data!
 
-
+library(palmerpenguins)
 
 ## Glimpse helps us get a sense of what kinds of dimensions, types of variables, and responses we have in our data frame
+
+glimpse(penguins)
 
 ```
 
@@ -57,11 +59,15 @@ library(tictoc)
 
 ## We can see how many species we have + how many of each species in our dataset
 
-
+penguins %>% 
+  group_by(species) %>% 
+  tally()
 
 ## But how many are on each island? If we wanted to visit only one of the islands, what would be best for our penguin seeing buck?
 
-
+penguins %>% 
+  group_by(species, island) %>% 
+  tally()
 
 ```
 
@@ -69,15 +75,26 @@ library(tictoc)
 
 ## Getting the bar plot of species alone
 
-
+penguins %>% 
+  dplyr::select(species) %>%
+  ggplot(aes(x = species)) + 
+  geom_histogram(stat = "count")
+  
 
 ## Getting the histogram of bill length alone
 
-
+penguins %>% 
+  dplyr::select(bill_length_mm) %>% 
+  ggplot(aes(x = bill_length_mm)) +
+  geom_histogram(alpha = 0.6)
 
 ## We can visualize the same distribution with different colors for different groups
 
-
+penguins %>% 
+  dplyr::select(bill_length_mm, species) %>% 
+  ggplot(aes(x = bill_length_mm, fill = species)) +
+  geom_histogram(aes(x = bill_length_mm), alpha = 0.6)
+  
 
 ```
 
@@ -85,15 +102,44 @@ library(tictoc)
 
 ## Creating the necessary inputs for the raincloud plots package https://github.com/jorvlan/raincloudplots
 
+chinstrap_bill_length <- penguins %>%
+  filter(species == "Chinstrap") %>% 
+  dplyr::select(bill_length_mm) %>% 
+  mutate(bill_length_mm = as.integer(bill_length_mm)) %>% 
+  deframe() %>% 
+  print()
 
+gentoo_bill_length <- penguins %>% 
+  filter(species == "Gentoo") %>% 
+  dplyr::select(bill_length_mm) %>% 
+  mutate(bill_length_mm = as.integer(bill_length_mm)) %>% 
+  deframe() %>% 
+  print()
 
 ## Helper function that puts the data in long format for raincloud plot
 
+df_1x1 <- data_1x1(
+  array_1 = chinstrap_bill_length,
+  array_2 = gentoo_bill_length,
+  jit_distance = 0.1,
+  jit_seed = 33
+)
 
+raincloud_1_h <- raincloud_1x1(
+  data = df_1x1,
+  colors = (c('dodgerblue', 'darkorange')),
+  fills = (c('dodgerblue', 'darkorange')),
+  size = 1,
+  alpha = 0.6,
+  ort = 'h') +
+  scale_x_continuous(breaks=c(1,2), labels=c("Chinstrap", "Gentoo"), limits = c(0,3)) +
+  xlab("Groups") +
+  ylab("Bill Length (mm)") +
+  theme_classic()
 
 ## Actually makes the raincloud plot
 
-
+raincloud_1_h
 
 ```
 
@@ -103,13 +149,22 @@ library(tictoc)
 
 ## First doing this with species and island, not super intuitive, though bottom left column is basically what we get with our group_by above
 
-
+penguins %>% 
+  dplyr::select(species, island) %>% 
+  GGally::ggpairs(aes(color = species)) +
+  scale_color_manual(values = c("darkorange","purple", "cyan4")) +
+  scale_fill_manual(values = c("darkorange","purple", "cyan4"))
 
 ```
 
 ```{r expanding our plotting to other variables}
 ## Looking at Species and a numeric variable
 
+penguins %>% 
+  dplyr::select(species, bill_length_mm) %>% 
+  GGally::ggpairs(aes(color = species)) + 
+  scale_color_manual(values = c("darkorange","purple", "cyan4")) +
+  scale_fill_manual(values = c("darkorange","purple", "cyan4"))
 
 ## Looking across all numberic variables other than year
 
@@ -124,18 +179,33 @@ library(tictoc)
 
 ## This way seems like it should work, but actually can completely mess up your data/make it not tidy
 
+penguins_oh_no <- penguins %>% 
+  mutate(mean_bill_length = mean(bill_length_mm, na.rm = T)) %>% 
+  print()
+
 
 ## If we do something like run a linear model predicting mean bill length (which we wouldn't do, but it's a useful illustration) we'll think we're looking at something measured 344 times
 
+(summary(lm(mean_bill_length ~ island, data = penguins_oh_no)))
 
 ## Btw we can tidy outputs from lms, though in this case that would obscure our df problem
 
+(summary(lm(mean_bill_length ~ island, data = penguins_oh_no))) %>%   
+  broom::tidy() %>% 
+  print()
 
 ## Instead we can use group_by species and then summarise to create a new tibble that's more useful
 
+penguins %>% 
+  group_by(island) %>% 
+  summarise(mean_bill_length = mean(bill_length_mm, na.rm = T)) %>% 
+  print()
 
 ## It doesn't have to be grouped by species either!
 
+penguins %>% 
+  summarise(mean_bill_length = mean(bill_length_mm, na.rm = T)) %>% 
+  print()
 
 ```
 
@@ -143,31 +213,69 @@ library(tictoc)
 
 ## Taking the mean across a bunch of variables
 
-
+penguins %>% 
+  group_by(species) %>% 
+  dplyr::summarise(across(
+    is.numeric,
+    mean
+  ))
 
 ## What if we want to deal with NA values? We could ignore them first. We could also impute data, but probably makes more sense to talk about that in a later stream
 
-
+penguins %>% 
+  group_by(species) %>% 
+  dplyr::summarise(across(
+    is.numeric,
+    ~mean(.x, na.rm = T)
+  ))
 
 ## What if we don't want the year column?
 
 ## This version kind of works, but not really since we're missing body mass now
 
-
+penguins %>% 
+  group_by(species) %>% 
+  dplyr::summarise(across(
+    contains("mm"),
+    ~mean(.x, na.rm = T)
+  ))
 
 ## This version is probably easier in this case (Though demonstrates that there are a lot of ways to solve any problem in R)
 
+penguins %>% 
+  group_by(species) %>% 
+  dplyr::summarise(across(
+    is.numeric,
+    ~mean(.x, na.rm = T)
+  )) %>% 
+  dplyr::select(-year)
 
 
 ```
 
 ```{r what if we want to get multiple summary statistics across variables at once}
 
-
+penguins %>% 
+  group_by(species) %>% 
+  dplyr::summarise(across(
+    .cols = is.numeric,
+    .fns = list(mean = mean, sd = sd, median = median, lowest_value_ever = min, max = max), na.rm = T,
+    .names = "{col}_{fn}"
+    
+  )) %>% 
+  dplyr::select(-contains("year"))
 
 ## We can select one variable at a time if we want to make this simpler/easier to read
 
-
+penguins %>% 
+  group_by(species) %>% 
+  dplyr::summarise(across(
+    .cols = is.numeric,
+    .fns = list(mean = mean, sd = sd, median = median, lowest_value_ever = min, max = max), na.rm = T,
+    .names = "{col}_{fn}"
+    
+  )) %>% 
+  dplyr::select(species, contains("bill_length"))
 
 ```
 
@@ -175,21 +283,39 @@ library(tictoc)
 
 ## About even across years
 
-
+penguins %>% 
+  group_by(year) %>% 
+  tally()
 
 ## Let's create a earlier than 2009, later than 2009 variable (Initially a character variable, so we want to convert it to a factor)
 
-
+penguins_years <- penguins %>% 
+  mutate(before_2009 = if_else(year < 2009, "yes", "no"),
+         before_2009 = as.factor(before_2009))
 
 ## Can now look at the updated tally
 
-
+penguins_years %>% 
+  group_by(before_2009) %>% 
+  tally()
 
 ## But wait, what if we'd had NAs? if_else might throw an error, but regular ifelse wouldn't and our info would be wrong. Can use case_when for safety
 
+penguins_years <- penguins %>% 
+  mutate(before_2009 = case_when(
+    
+    year < 2009 ~ "yes",
+    year >= 2009 ~ "no",
+    TRUE ~ NA_character_
+    
+  ),
+  before_2009 = as.factor(before_2009))
 
 ## Can now look at the updated tally again
 
+penguins_years %>% 
+  group_by(before_2009) %>% 
+  tally()
 
 ```
 
@@ -197,6 +323,11 @@ library(tictoc)
 
 ## First we split the dataset into training and testing, stratified on the outcome (so about equal proportions of the outcome show up in both datasets)
 
+set.seed(33)
+penguins_initial_split <- initial_split(penguins_years, prop = 3/4, strata = before_2009)
+
+penguins_train <- training(penguins_initial_split)
+penguins_test <- testing(penguins_initial_split)
 
 ```
 
@@ -204,35 +335,61 @@ library(tictoc)
 
 ## Let's clean the training data and get it ready to go via recipes
 
+rec_penguins <- recipe(before_2009 ~ ., data = penguins_train) %>% 
+  step_rm(year) %>% 
+  step_knnimpute(all_predictors()) %>%
+  step_normalize(all_numeric(),-all_outcomes()) %>% 
+  step_BoxCox(all_numeric())
 
 ## Creating a model
 
-
+lr_mod <- logistic_reg() %>%
+  set_engine("glm") %>% 
+  set_mode("classification")
+  
 ## Creating a workflow
 
-
+penguins_wf <- 
+  workflow() %>% 
+  add_model(lr_mod) %>% 
+  add_recipe(rec_penguins)
 
 ## Fit 10 fold cross-validation
 
 # Set up multiple cores
 
-
+registerDoMC(cores = 7)
 
 # Create the cross-validation folds
 
-
+set.seed(33)
+folds_penguins_pred <- vfold_cv(penguins_train, v = 10, repeats = 5, strata = before_2009)
 
 ## Run the CV models here
 
+keep_pred <- control_resamples(save_pred = TRUE)
 
+tic()
+set.seed(33)
+penguins_fit_rs <-
+  penguins_wf %>% 
+  fit_resamples(folds_penguins_pred, control = keep_pred)
+toc()
 
 ## Get the AUC value here
 
-
+auc_penguins <- penguins_fit_rs %>% 
+  collect_predictions(summarize = TRUE) %>% 
+  yardstick::roc_auc(truth = before_2009, .estimate = .pred_yes) %>% 
+  print()
 
 ## Show the ROC curve here
 
-
+auc_penguins_roc_curve <- penguins_fit_rs %>% 
+  collect_predictions(summarize = TRUE) %>% 
+  roc_curve(truth = before_2009, .estimate = .pred_yes) %>% 
+  autoplot() %>% 
+  print()
 
 ```
 
